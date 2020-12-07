@@ -1,5 +1,5 @@
 //Rutas para crear usuarios
-const { response } = require('express');
+
 const express = require('express');
 const router = express.Router();
 
