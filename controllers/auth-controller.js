@@ -45,7 +45,7 @@ exports.autenticarUsuario = async (req, res) => {
 
 		//Si el password y el email es correcto entonses crear y firmar el JWT
 		const payload = {
-			usuario: usuario.id,
+			usuario: { id: usuario.id },
 		};
 
 		//firma del JWT
