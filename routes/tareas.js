@@ -16,4 +16,6 @@ router.post(
 	tareaController.createTarea
 );
 
+router.get('/', auth, tareaController.getTareas);
+
 module.exports = router;

@@ -26,8 +26,10 @@ exports.createTarea = async (req, res) => {
 			});
 		}
 
-        //Revisar si el proyecto actual pertenece al usuario autenticado
-		if (existeProyecto.creador.toString() !== existeProyecto.creador.toString()) {
+		//Revisar si el proyecto actual pertenece al usuario autenticado
+		if (
+			existeProyecto.creador.toString() !== existeProyecto.creador.toString()
+		) {
 			return res.status(401).json({
 				ok: false,
 				error: {
@@ -46,5 +48,41 @@ exports.createTarea = async (req, res) => {
 	} catch (error) {
 		console.log(error);
 		res.status(500).send;
+	}
+};
+
+// Obotener las tareas del proyecto
+exports.getTareas = async (req, res) => {
+	try {
+		//extraemos el proyecto
+		const { proyecto } = req.body;
+		const existeProyecto = await Proyecto.findById(proyecto);
+		if (!existeProyecto) {
+			return res.status(404).json({
+				ok: false,
+				error: {
+					msg: 'Proyecto no encontrado',
+				},
+			});
+		}
+
+		if (existeProyecto.creador.toString() !== req.usuario.id) {
+			return res.status(401).json({
+				ok: false,
+				error: {
+					msg: 'No autorizado',
+				},
+			});
+		}
+
+		//Obtener todas las tareas por proyecto
+		const tareas = await Tarea.find({ proyecto });
+		res.json({
+			ok: true,
+			tareas,
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(500).send('Hubo un error');
 	}
 };
