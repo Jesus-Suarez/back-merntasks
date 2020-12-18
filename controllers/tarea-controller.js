@@ -86,3 +86,53 @@ exports.getTareas = async (req, res) => {
 		res.status(500).send('Hubo un error');
 	}
 };
+
+exports.updateTarea = async (req, res) => {
+	try {
+		//extraer la tarea y comprobar si existe
+		const { proyecto, nombre, estado } = req.body;
+
+		//Revisar si la tarea existe
+		let tarea = await Tarea.findById(req.params.id);
+		if (!tarea) {
+			return res.status(404).json({
+				ok: false,
+				error: {
+					msg: 'La tarea no existe',
+				},
+			});
+		}
+
+		//Extraer el proyecto
+		const existeProyecto = await Proyecto.findById(proyecto);
+		//Revisar si el proyecto que se quiere actualizar pertenece al usuario autenticado
+		if (existeProyecto.creador.toString() !== req.usuario.id) {
+			return res.status(401).json({
+				ok: false,
+				error: {
+					msg: 'No autorizado',
+				},
+			});
+		}
+
+		//Creamos un nuevo objeto con la nueva informacion que se actualizara nuestro proyecto
+		const nuevaTarea = {};
+
+		if (nombre) nuevaTarea.nombre = nombre;
+
+		if (estado) nuevaTarea.estado = estado;
+
+		//Actualiza la tarea
+		tarea = await Tarea.findOneAndUpdate({ _id: req.params.id }, nuevaTarea, {
+			new: true,
+		});
+
+		res.json({
+			ok: true,
+			tarea,
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(500).send('Upps.. Error en el servidor!!');
+	}
+};

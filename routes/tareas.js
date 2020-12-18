@@ -18,4 +18,6 @@ router.post(
 
 router.get('/', auth, tareaController.getTareas);
 
+router.put('/:id', auth, tareaController.updateTarea);
+
 module.exports = router;
