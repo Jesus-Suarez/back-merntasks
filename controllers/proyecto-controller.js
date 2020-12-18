@@ -105,3 +105,42 @@ exports.updateProject = async (req, res) => {
 		res.status(500).send({ msg: 'Error en el Servidor' });
 	}
 };
+
+//Elimina un proyecto por su ID
+exports.deleteProject = async (req, res) => {
+	try {
+		//Consultamos el proyecto en la DB con el id de la url
+		let proyecto = await Proyecto.findById(req.params.id);
+		//Revisamos que el proyecto exista
+		if (!proyecto) {
+			return res.status(404).json({
+				ok: false,
+				error: {
+					msg: 'Proyecto no encontrado',
+				},
+			});
+		}
+
+		//Verificar que el usuario concuerde con el creador del proyecto
+		//console.log(typeof proyecto.creador.toString());
+		//console.log(typeof req.params.id);
+		if (proyecto.creador.toString() !== req.usuario.id) {
+			return res.status(401).json({
+				ok: false,
+				error: {
+					msg: 'No autorizado',
+				},
+			});
+		}
+
+		//Eliminamos el proyecto
+		await Proyecto.findByIdAndRemove({ _id: req.params.id });
+		res.json({
+			ok: true,
+			msg: 'Proyecto eliminado',
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(500).send({ msg: 'Upps... Error en el servidor' });
+	}
+};
