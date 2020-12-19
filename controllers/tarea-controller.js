@@ -136,3 +136,42 @@ exports.updateTarea = async (req, res) => {
 		res.status(500).send('Upps.. Error en el servidor!!');
 	}
 };
+
+//Elimina una tarea
+exports.deleteTarea = async (req, res) => {
+	try {
+		//Extraer el proyecto y revisar si existe
+		const { proyecto } = req.body;
+		//Comprobar si la tarea existe o no
+		let tarea = await Tarea.findById(req.params.id);
+		if (!tarea) {
+			return res.status(404).json({
+				ok: false,
+				error: {
+					msg: 'La tarea no existe',
+				},
+			});
+		}
+
+		//Extraemos la tarea para revisar si la persona que lo creo es el usuario auteticado
+		const existeProyecto = await Proyecto.findById(proyecto);
+		if (existeProyecto.creador.toString() !== req.usuario.id) {
+			return res.status(401).json({
+				ok: false,
+				error: {
+					msg: 'No autorizado',
+				},
+			});
+		}
+
+		//Eliminamos la tarea
+		await Tarea.findByIdAndRemove({ _id: req.params.id });
+		res.json({
+			ok: true,
+			msg: 'La tarea se ha eliminado',
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(500).json('Upps.. Error en el servidor.');
+	}
+};
