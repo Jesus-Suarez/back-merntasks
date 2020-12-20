@@ -69,3 +69,16 @@ exports.autenticarUsuario = async (req, res) => {
 		console.log(error);
 	}
 };
+
+//Obtiene que  usuario que esta autenticado
+exports.usuarioAutenticado = async (req, res) => {
+	try {
+		//Buscamos el usuario autenticado en la BD con el token
+		// El select en la consulta con el guin es para decirle que no queremos excluir esos datos
+		const usuario = await Usuario.findById(req.usuario.id).select('-password');
+		res.json({ usuario });
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ msg: 'Hubo un error' });
+	}
+};
