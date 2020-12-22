@@ -24,6 +24,7 @@ exports.autenticarUsuario = async (req, res) => {
 	try {
 		//REvisar que sea un usuario registrado
 		const usuario = await Usuario.findOne({ email });
+
 		if (!usuario) {
 			res.status(400).json({
 				ok: false,
